@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# call.sh
+# Copyright (C) 2018 jack <jack@HP-WorkStation>
+#
+# Distributed under terms of the MIT license.
+#
+
+. ./fabric.conf
+docker exec cli peer chaincode query -n $1cc -c '{"Args":["'"$2"'",'"$3"']}' -C ${CHANNEL[$1]}
