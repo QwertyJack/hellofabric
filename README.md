@@ -66,6 +66,9 @@ cd basic-network
 
 * java client
 
+Open project in your IDE and run `src/Main.java`.
+See also [README.md under fabric-java-sdk-demofabric-java-sdk-demo](fabric-java-sdk-demo/README.md).
+
 ## Copyleft
 
 * [Jack](https://github.com/QwertyJack)
