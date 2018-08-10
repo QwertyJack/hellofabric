@@ -4,7 +4,7 @@
 * Run `./generate.sh` if new channel is added.
 * To (re-)start the network, run `./restart.sh`;
   you may restart it every time when adding new chaincode or channel is reconfigured.
-* You may want to upgrade the chaincode without restarting the network:
+* Once chaincode is **installed successully**, you may want to upgrade the chaincode without restarting the network:
 
 ```bash
 ./upgrade.sh <chaincode_name> <version>
@@ -12,7 +12,7 @@
 
 NOTE:
   * the chaincode is at `/chaincode/<chaincode_name>`
-  * the `version` ***must be different***, even if build failed; the init version is `1.0`
+  * the `version` **must be different**, even if build failed; the init version is `1.0`
 
 * Call chaincode via `./query` or `./invoke`
 
@@ -23,6 +23,7 @@ NOTE:
 The `parameter` must in the form of `'"par1", "par2", ...'`, i.e.
 
 ```bash
+# call function `myfunction' of chaincode `test' with parameter `par1', ...
 ./query test myfunction '"par1", "par2", "par3"'
 ./invoke test myfunction '"par1"'
 ```
@@ -31,7 +32,7 @@ The `parameter` must in the form of `'"par1", "par2", ...'`, i.e.
 
 ### Chaincode Naming Spec
 
-For example, chaincode `reg`:
+For example, chaincode `simple`:
 
-* location: `/chaincode/reg`
-* cc name: `regcc`
+* src: `/chaincode/simple`
+* chaincode name: `simplecc`
