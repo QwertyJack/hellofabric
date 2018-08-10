@@ -6,11 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="fabric-java-sdk-demo" />
+        <module name="fabric-sdk-java-demo" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="fabric-java-sdk-demo" target="8" />
-    </bytecodeTargetLevel>
   </component>
 </project>
