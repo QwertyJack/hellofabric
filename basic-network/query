@@ -6,5 +6,6 @@
 # Distributed under terms of the MIT license.
 #
 
-. ./fabric.conf
-docker exec cli peer chaincode query -n $1cc -c '{"Args":["'"$2"'",'"$3"']}' -C ${CHANNEL[$1]}
+#. ./fabric.con
+. ./k8.conf
+docker exec $ID peer chaincode query -n $CC -c '{"Args":["'"$1"'",'"$2"']}' -C $CH
