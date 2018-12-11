@@ -37,13 +37,13 @@ then
     # update sk, by Jack
     sk_new=$(find crypto-config/peerOrganizations/org1.example.com/ca -name "*_sk" -exec basename {} \;)
     sed -i "s/"$sk_old"/"$sk_new"/" ./docker-compose.yml
+fi
 
-    # generate genesis block for orderer
-    configtxgen -profile OneOrgOrdererGenesis -outputBlock ./config/genesis.block
-    if [ "$?" -ne 0 ]; then
-        echo "Failed to generate orderer genesis block..."
-        exit 1
-    fi
+echo Generate genesis block for orderer
+configtxgen -profile OneOrgOrdererGenesis -outputBlock ./config/genesis.block
+if [ "$?" -ne 0 ]; then
+    echo "Failed to generate orderer genesis block..."
+    exit 1
 fi
 
 . ./fabric.conf
