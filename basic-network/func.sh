@@ -35,25 +35,53 @@ gen_crypto_4_channel () {
     fi
 }
 
-create_and_join_channel () {
+create_channel () {
     CHANNEL_NAME=$1
 
     # Create the channel
     echo Create channel: $CHANNEL_NAME
-    docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@org1.example.com/msp" peer0.org1.example.com peer channel create -o orderer.example.com:7050 -c $CHANNEL_NAME -f /etc/hyperledger/configtx/channel_$CHANNEL_NAME.tx
 
-    # Join peer0.org1.example.com to the channel.
-    echo Join channel: $CHANNEL_NAME
-    docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@org1.example.com/msp" peer0.org1.example.com peer channel join -b $CHANNEL_NAME.block
+    CORE_PEER_LOCALMSPID=Org1MSP \
+        CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp \
+        peer channel create -o "$ORDERER_ENDPOINT" -c $CHANNEL_NAME -f `pwd`/config/channel_$CHANNEL_NAME.tx
+
+    mv $CHANNEL_NAME.block config
 }
 
-install_and_instantiate() {
-    echo Install chaincode: $1, version: $VERSION
-    docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp" cli peer chaincode install -n "$1"cc -v "$VERSION" -p github.com/$1
+join_channel () {
+    CHANNEL_NAME=$1
+    ORG=$2
+    PEER=$3
+
+    # Join peer to the channel.
+    echo Join peer$PEER.org$ORG to channel $CHANNEL_NAME
+    docker exec -e "CORE_PEER_LOCALMSPID=Org"$ORG"MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@org"$ORG".example.com/msp" peer$PEER.org$ORG.example.com peer channel join -b /etc/hyperledger/configtx/$CHANNEL_NAME.block
+}
+
+install_cc () {
+    CC=$1
+    CHAN=$2
+    ORG=$3
+    PEER=$4
+
+    echo Install $CC:$VERSION@$CHAN to peer$peer.org$ORG
+
+    docker exec \
+        -e "CORE_PEER_ADDRESS=peer$PEER.org$ORG.example.com:7051" \
+        -e "CORE_PEER_LOCALMSPID=Org${ORG}MSP" \
+        -e "CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org$ORG.example.com/users/Admin@org$ORG.example.com/msp" \
+        cli peer chaincode install -n "$CC"cc -v "$VERSION" -p github.com/$CC
+}
+
+instantiate_cc () {
+    CC=$1
+    CHAN=$2
+    ORG=$3
+    PEER=$4
 
     ARGS='{"Args":[""]}'
-    echo Instantiate chaincode: $1, channel: $2
-    docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp" cli peer chaincode instantiate -o orderer.example.com:7050 -C "$2" -n "$1"cc -v $VERSION -c "$ARGS" -P "$POLICY"
+    echo Instantiate $CC:$VERSION@peer$peer.org$ORG
+    docker exec cli peer chaincode instantiate -o orderer.example.com:7050 -C "$CHAN" -n "$CC"cc -v $VERSION -c "$ARGS" -P "$POLICY"
 }
 
 upgrade() {

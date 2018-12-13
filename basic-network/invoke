@@ -7,4 +7,9 @@
 #
 
 . ./fabric.conf
-docker exec cli peer chaincode invoke -n $1cc -c '{"Args":["'"$2"'",'"$3"']}' -C ${CHANNEL[$1]}
+
+docker exec \
+    -e "CORE_PEER_ADDRESS=peer$PEER.org$ORG.example.com:7051" \
+    -e "CORE_PEER_LOCALMSPID=Org${ORG}MSP" \
+    -e "CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org$ORG.example.com/users/Admin@org$ORG.example.com/msp" \
+    cli peer chaincode invoke -n $1cc -c '{"Args":["'"$2"'",'"$3"']}' -C ${CHANNEL[$1]}
