@@ -41,11 +41,15 @@ create_channel () {
     # Create the channel
     echo Create channel: $CHANNEL_NAME
 
-    CORE_PEER_LOCALMSPID=Org1MSP \
-        CORE_PEER_MSPCONFIGPATH=`pwd`/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp \
-        peer channel create -o "$ORDERER_ENDPOINT" -c $CHANNEL_NAME -f `pwd`/config/channel_$CHANNEL_NAME.tx
+    docker exec \
+        -e CORE_PEER_LOCALMSPID=Org1MSP \
+        -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@org1.example.com/msp \
+        peer0.org1.example.com \
+        peer channel create -o orderer.example.com:7050 -c $CHANNEL_NAME -f /etc/hyperledger/configtx/channel_$CHANNEL_NAME.tx
 
-    mv $CHANNEL_NAME.block config
+    docker exec \
+        peer0.org1.example.com \
+        mv $CHANNEL_NAME.block /etc/hyperledger/configtx
 }
 
 join_channel () {
